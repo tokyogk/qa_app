@@ -46,7 +46,6 @@ public class QuestionSendActivity extends AppCompatActivity implements View.OnCl
     private EditText mBodyText;
     private ImageView mImageView;
     private Button mSendButton;
-
     private int mGenre;
     private Uri mPictureUri;
 

@@ -26,7 +26,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
+//★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
+import com.google.firebase.database.FavoriteEventListener;
+//★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
 import java.util.ArrayList;
 import java.util.HashMap;
 

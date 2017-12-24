@@ -28,10 +28,10 @@ import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText mEmailEditText;
-    EditText mPasswordEditText;
-    EditText mNameEditText;
-    ProgressDialog mProgress;
+    EditText mEmailEditText; // メールのエデットテキスト　メンバ変数
+    EditText mPasswordEditText; // パスワードのエデットテキスト　メンバ変数
+    EditText mNameEditText; // 　名前のエデットテキスト　メンバ変数
+    ProgressDialog mProgress; // プログレスダイヤログ　ぐるぐる回るやつ　メンバ変数
 
     FirebaseAuth mAuth;
     OnCompleteListener<AuthResult> mCreateAccountListener;

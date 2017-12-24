@@ -157,7 +157,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         mAnswerRef.addChildEventListener(mEventListener);
 
         //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
-        favRef = dataBaseReference
+        favRef = dataBaseReference.child(Const.ContentsPATH).child(Const.FavoritesPATH).child(user.getUid());
         //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
     }
 }

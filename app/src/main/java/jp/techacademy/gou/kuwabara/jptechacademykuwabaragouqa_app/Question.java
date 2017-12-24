@@ -10,6 +10,9 @@ public class Question implements Serializable {
     private String mName;
     private String mUid;
     private String mQuestionUid;
+    //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
+    private String mFavoriteAnswer;
+    //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
     private int mGenre;
     private byte[] mBitmapArray;
     private ArrayList<Answer> mAnswerArrayList;
@@ -30,9 +33,10 @@ public class Question implements Serializable {
         return mUid;
     }
 
-    public String getQuestionUid() {
-        return mQuestionUid;
-    }
+    public String getQuestionUid() { return mQuestionUid; }
+    //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
+    public String getmFavoriteAnswer() { return mFavoriteAnswer; }
+    //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
     public int getGenre() {
         return mGenre;
     }
@@ -45,14 +49,18 @@ public class Question implements Serializable {
         return mAnswerArrayList;
     }
 
-    public Question(String title, String body, String name, String uid, String questionUid, int genre, byte[] bytes, ArrayList<Answer> answers) {
+    public Question(String title, String body, String name, String uid, String questionUid, String favoriteAnswe , int genre, byte[] bytes, ArrayList<Answer> answers) {
         mTitle = title;
         mBody = body;
         mName = name;
         mUid = uid;
         mQuestionUid = questionUid;
+        //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
+        mFavoriteAnswer = favoriteAnswe;
+        //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
         mGenre = genre;
         mBitmapArray = bytes.clone();
         mAnswerArrayList = answers;
     }
+
 }
