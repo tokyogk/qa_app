@@ -11,8 +11,8 @@ public class Question implements Serializable {
     private String mUid;
     private String mQuestionUid;
     //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
-    private String mFavoriteAnswer;
-    //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
+    private String mFavoriteid;
+    //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
     private int mGenre;
     private byte[] mBitmapArray;
     private ArrayList<Answer> mAnswerArrayList;
@@ -35,32 +35,32 @@ public class Question implements Serializable {
 
     public String getQuestionUid() { return mQuestionUid; }
     //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
-    public String getmFavoriteAnswer() { return mFavoriteAnswer; }
-    //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
-    public int getGenre() {
-        return mGenre;
-    }
+    public String getmFavorite() { return mFavorite; }
+    //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
+    public int getGenre() { return mGenre; }
 
-    public byte[] getImageBytes() {
-        return mBitmapArray;
-    }
+    public byte[] getImageBytes() { return mBitmapArray; }
 
-    public ArrayList<Answer> getAnswers() {
-        return mAnswerArrayList;
-    }
+    public ArrayList<Answer> getAnswers() { return mAnswerArrayList; }
 
-    public Question(String title, String body, String name, String uid, String questionUid, String favoriteAnswe , int genre, byte[] bytes, ArrayList<Answer> answers) {
+    public Question(String title, String body, String name, String uid, String questionUid, int genre, byte[] bytes, ArrayList<Answer> answers) {
         mTitle = title;
         mBody = body;
         mName = name;
         mUid = uid;
         mQuestionUid = questionUid;
-        //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
-        mFavoriteAnswer = favoriteAnswe;
-        //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
         mGenre = genre;
         mBitmapArray = bytes.clone();
         mAnswerArrayList = answers;
     }
-
+    //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
+    public Favorite(String title,  String uid, String questionUid, String favoriteid, byte[] bytes, ArrayList<Answer> answers) {
+        mTitle = title;
+        mUid = uid;
+        mQuestionUid = questionUid;
+        mFavoriteid = favoriteid;
+        mBitmapArray = bytes.clone();
+        mAnswerArrayList = answers;
+    }
+    //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
 }

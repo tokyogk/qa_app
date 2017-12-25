@@ -1,8 +1,6 @@
 package jp.techacademy.gou.kuwabara.jptechacademykuwabaragouqa_app;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -26,9 +24,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-//★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
-import com.google.firebase.database.FavoriteEventListener;
-//★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
+
 import java.util.ArrayList;
 import java.util.HashMap;
 

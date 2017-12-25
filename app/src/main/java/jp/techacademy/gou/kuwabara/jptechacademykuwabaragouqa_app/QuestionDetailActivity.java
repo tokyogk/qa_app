@@ -89,12 +89,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question_detail);
-
-        //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
-        mfab2Button = (Button) findViewById(R.id.fab2);
-        mfab2Button.setOnClickListener(this);
-        //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
-
         //★★★　↓↓　QAアプリ課題で追加部分　お気に入りボタンの表示　↓↓　★★★//
         final FloatingActionButton fab2 = (FloatingActionButton) findViewById(R.id.fab2);
                 // ボタンを非表示
@@ -108,13 +102,18 @@ public class QuestionDetailActivity extends AppCompatActivity {
         }
         //★★★　↑↑　QAアプリ課題で追加部分　　お気に入りボタンの表示　　↑↑　★★★//
         //★★★　↓↓　QAアプリ課題で追加部分　お気に入り追加・削除　↓↓　★★★//
-        fab2.setOnClickListener(new View.OnClickListener(new View.OnClickListener) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            DatabaseReference favRef = dataBaseReference.child(Const.FavoritesPATH).child(user.getUid());
-            data.put("questionUid", mQuestion.getUid()); // 開いている質問のqquestionオブジェクト
-            favRef.push().setValue(data);
-        }
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // ifをつかってお気に入り登録・削除およびボタンの変更
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    DatabaseReference favRef = dataBaseReference.child(Const.FavoritesPATH).child(user.getUid());
+                    data.put("questionUid", question.getUid()); // このquestionは開いている質問のquestionオブジェクト
+                    favRef.push().setValue(data);
+                }
+
+            }
         });
         //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
 
