@@ -105,16 +105,30 @@ public class QuestionDetailActivity extends AppCompatActivity {
         fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // ifをつかってお気に入り登録・削除およびボタンの変更
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user != null) {
-                    DatabaseReference favRef = dataBaseReference.child(Const.FavoritesPATH).child(user.getUid());
-                    data.put("questionUid", question.getUid()); // このquestionは開いている質問のquestionオブジェクト
-                    favRef.push().setValue(data);
-                }
 
+                DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
+                DatabaseReference genreRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
+
+                Map<String, String, String> data = new HashMap<String, String, String>();
+
+                // UID
+                data.put("uid", FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                // ユーザーIDと質問IDとお気に入りIDを取得する
+                String uid = mUid.getText().toString();
+                String questionUid = mQuestionUid.getText().toString();
+                String favoriteid = mQuestionUid.getText().toString();
+
+                data.put("mUid", mUid);
+                data.put("mQuestionUid", mQuestionUid);
+                data.put("mQuestionUid", mQuestionUid);
+
+                genreRef.push().setValue(data, this);
+                mProgress.show();
             }
-        });
+
+            });
+
         //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
 
         // 渡ってきたQuestionのオブジェクトを保持する

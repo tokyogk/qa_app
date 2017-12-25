@@ -1,6 +1,5 @@
 package jp.techacademy.gou.kuwabara.jptechacademykuwabaragouqa_app;
 
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -10,9 +9,6 @@ public class Question implements Serializable {
     private String mName;
     private String mUid;
     private String mQuestionUid;
-    //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
-    private String mFavoriteid;
-    //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
     private int mGenre;
     private byte[] mBitmapArray;
     private ArrayList<Answer> mAnswerArrayList;
@@ -34,9 +30,7 @@ public class Question implements Serializable {
     }
 
     public String getQuestionUid() { return mQuestionUid; }
-    //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
-    public String getmFavorite() { return mFavorite; }
-    //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
+
     public int getGenre() { return mGenre; }
 
     public byte[] getImageBytes() { return mBitmapArray; }
@@ -53,14 +47,4 @@ public class Question implements Serializable {
         mBitmapArray = bytes.clone();
         mAnswerArrayList = answers;
     }
-    //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
-    public Favorite(String title,  String uid, String questionUid, String favoriteid, byte[] bytes, ArrayList<Answer> answers) {
-        mTitle = title;
-        mUid = uid;
-        mQuestionUid = questionUid;
-        mFavoriteid = favoriteid;
-        mBitmapArray = bytes.clone();
-        mAnswerArrayList = answers;
-    }
-    //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
 }
