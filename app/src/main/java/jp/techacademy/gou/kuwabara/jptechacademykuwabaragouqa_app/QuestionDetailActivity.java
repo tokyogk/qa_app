@@ -1,22 +1,12 @@
 package jp.techacademy.gou.kuwabara.jptechacademykuwabaragouqa_app;
 
-import android.*;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,7 +17,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,10 +25,14 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private ListView mListView;
     private Question mQuestion;
     private QuestionDetailListAdapter mAdapter;
-    //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
+    //★★★　↓↓　 ボタンの変数設定　QAアプリ課題で追加部分　↓↓　★★★//
     private Button mfab2Button;
-    //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
     private DatabaseReference mAnswerRef;
+
+    //★★★　↓↓　 お気に入り判別用のboolean　QAアプリ課題で追加部分　↓↓　★★★//
+    private boolean isFavorite = false;
+    //★★★　↓↓　 ファイヤーベースでのユーザー変数設定　QAアプリ課題で追加部分　↓↓　★★★//
+    private FirebaseUser user;
 
     private ChildEventListener mEventListener = new ChildEventListener() {
         @Override
@@ -84,52 +77,98 @@ public class QuestionDetailActivity extends AppCompatActivity {
 
         }
     };
+    //★★★　↓↓　お気に入りのリスナー登録　QAアプリ課題で追加部分　↓↓　★★★//
+
+    private ChildEventListener mFavoriteEventListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            データの登録解除のボタンに切り替える処理をかく
+            ImageView image1 = new ImageView(this);
+            image1.setImageResource(R.drawable.unlike);
+            //フラグをきりかえる。
+            isFavorite = true;
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question_detail);
-        //★★★　↓↓　QAアプリ課題で追加部分　お気に入りボタンの表示　↓↓　★★★//
-        final FloatingActionButton fab2 = (FloatingActionButton) findViewById(R.id.fab2);
-                // ボタンを非表示
-                fab2.setVisibility(View.GONE);
 
-                // ログイン済みのユーザーを取得する
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        //★★★　↓↓　お気に入りボタンのデータベース取得　QAアプリ課題で追加部分　↓↓　★★★//
+        DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
+
+        //★★★　↓↓　お気に入りボタンの非表示　　QAアプリ課題で追加部分　↓↓　★★★//
+        mfab2Button = (Button) findViewById(R.id.fab2);
+
+        //★★★　↓↓　お気に入りボタンの表示　　QAアプリ課題で追加部分　↓↓　★★★//
+        mfab2Button.setVisibility(View.GONE);
+
+        //★★★　↓↓　ログイン済ユーザーの取得　QAアプリ課題で追加部分　↓↓　★★★//
+        user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             // ボタンを表示
-            fab2.setVisibility(View.VISIBLE);
+            mfab2Button.setVisibility(View.VISIBLE);
+            DatabaseReference favRef = dataBaseReference.child(Const.FavoritePATH).child(user.getUid()).child(mQuestion.getQuestionUid());
+            favRef.addChildEventListener(mFavoriteEventListener);
+
+        }else{
+            mfab2Button.setVisibility(View.GONE);
         }
-        //★★★　↑↑　QAアプリ課題で追加部分　　お気に入りボタンの表示　　↑↑　★★★//
-        //★★★　↓↓　QAアプリ課題で追加部分　お気に入り追加・削除　↓↓　★★★//
-        fab2.setOnClickListener(new View.OnClickListener() {
+        //★★★　↓↓　お気に入りボタンを押した時の分岐設定　QAアプリ課題で追加部分　↓↓　★★★//
+
+        mfab2Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
-                DatabaseReference genreRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
+                DatabaseReference genreRef = dataBaseReference.child(Const.FavoritePATH).child(user.getUid()).child(mQuestion.getQuestionUid());
+                //↓↓お気にいり解除の処理
+                if(isFavorite == true){//お気に入り解除の処理
+                    //★★★　↓↓　お気に入りじゃないボタン表示　QAアプリ課題で追加部分　↓↓　★★★//
+                    ImageView image1 = new ImageView(this);
+                    image1.setImageResource(R.drawable.unlike);
 
-                Map<String, String, String> data = new HashMap<String, String, String>();
+                    genreRef.getRef().removeValue();
 
-                // UID
-                data.put("uid", FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-                // ユーザーIDと質問IDとお気に入りIDを取得する
-                String uid = mUid.getText().toString();
-                String questionUid = mQuestionUid.getText().toString();
-                String favoriteid = mQuestionUid.getText().toString();
+                    genreRef.removeValue();
+                }else{//お気に入り登録の処理
+                    //★★★　↓↓　お気に入りボタン表示　QAアプリ課題で追加部分　↓↓　★★★//
+                    ImageView image2 = new ImageView(this);
+                    image2.setImageResource(R.drawable.like);
 
-                data.put("mUid", mUid);
-                data.put("mQuestionUid", mQuestionUid);
-                data.put("mQuestionUid", mQuestionUid);
-
+                Map<String, String> data = new HashMap<String, String>();
+                data.put("genru", String.valueOf(mQuestion.getGenre()));
                 genreRef.push().setValue(data, this);
-                mProgress.show();
+
+                }
+                //★★★　↓↓　お気に入りにしているフラグ　QAアプリ課題で追加部分　↓↓　★★★//
+                isFavorite = !isFavorite;
+
+
             }
+        });
 
-            });
-
-        //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
 
         // 渡ってきたQuestionのオブジェクトを保持する
         Bundle extras = getIntent().getExtras();
@@ -165,12 +204,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
             }
         });
 
-        DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
         mAnswerRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getGenre())).child(mQuestion.getQuestionUid()).child(Const.AnswersPATH);
         mAnswerRef.addChildEventListener(mEventListener);
 
-        //★★★　↓↓　QAアプリ課題で追加部分　↓↓　★★★//
-        favRef = dataBaseReference.child(Const.ContentsPATH).child(Const.FavoritesPATH).child(user.getUid());
-        //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//
     }
 }
