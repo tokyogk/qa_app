@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,7 +24,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private Question mQuestion;
     private QuestionDetailListAdapter mAdapter;
     //★★★　↓↓　 ボタンの変数設定　QAアプリ課題で追加部分　↓↓　★★★//
-    private Button mfab2Button;
+    private FloatingActionButton mfab2Button;
     private DatabaseReference mAnswerRef;
 
     //★★★　↓↓　 お気に入り判別用のboolean　QAアプリ課題で追加部分　↓↓　★★★//
@@ -82,9 +80,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private ChildEventListener mFavoriteEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            データの登録解除のボタンに切り替える処理をかく
-            ImageView image1 = new ImageView(this);
-            image1.setImageResource(R.drawable.unlike);
+            //データの登録解除のボタsetImageResourceンに切り替える処理をかく
+            mfab2Button.setImageResource(R.drawable.unlike);
             //フラグをきりかえる。
             isFavorite = true;
         }
@@ -119,7 +116,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
 
         //★★★　↓↓　お気に入りボタンの非表示　　QAアプリ課題で追加部分　↓↓　★★★//
-        mfab2Button = (Button) findViewById(R.id.fab2);
+        mfab2Button = (FloatingActionButton) findViewById(R.id.fab2);
 
         //★★★　↓↓　お気に入りボタンの表示　　QAアプリ課題で追加部分　↓↓　★★★//
         mfab2Button.setVisibility(View.GONE);
@@ -135,7 +132,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         }else{
             mfab2Button.setVisibility(View.GONE);
         }
-        //★★★　↓↓　お気に入りボタンを押した時の分岐設定　QAアプリ課題で追加部分　↓↓　★★★//
+        //★★★　↓↓　お気に入りボタンを押した時の分岐設定　QAアプリ課題で追加部分　↓↓★★★//
 
         mfab2Button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,17 +142,12 @@ public class QuestionDetailActivity extends AppCompatActivity {
                 //↓↓お気にいり解除の処理
                 if(isFavorite == true){//お気に入り解除の処理
                     //★★★　↓↓　お気に入りじゃないボタン表示　QAアプリ課題で追加部分　↓↓　★★★//
-                    ImageView image1 = new ImageView(this);
-                    image1.setImageResource(R.drawable.unlike);
-
-                    genreRef.getRef().removeValue();
-
-
+                    mfab2Button.setImageResource(R.drawable.unlike);
                     genreRef.removeValue();
+
                 }else{//お気に入り登録の処理
                     //★★★　↓↓　お気に入りボタン表示　QAアプリ課題で追加部分　↓↓　★★★//
-                    ImageView image2 = new ImageView(this);
-                    image2.setImageResource(R.drawable.like);
+                    mfab2Button.setImageResource(R.drawable.like);
 
                 Map<String, String> data = new HashMap<String, String>();
                 data.put("genru", String.valueOf(mQuestion.getGenre()));
