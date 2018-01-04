@@ -123,6 +123,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
 
         //★★★　↓↓　ログイン済ユーザーの取得　QAアプリ課題で追加部分　↓↓　★★★//
         user = FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             // ボタンを表示
             mfab2Button.setVisibility(View.VISIBLE);
