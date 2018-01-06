@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private int mGenre = 0;
-    
+
     private DatabaseReference mDatabaseReference;
     private DatabaseReference mGenreRef;
     private ListView mListView;
