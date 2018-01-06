@@ -2,6 +2,7 @@ package jp.techacademy.gou.kuwabara.jptechacademykuwabaragouqa_app;
 
 import java.io.Serializable;
 
+
 public class Favorite implements Serializable {
     private String mUid;
     private String mQuestionUid;

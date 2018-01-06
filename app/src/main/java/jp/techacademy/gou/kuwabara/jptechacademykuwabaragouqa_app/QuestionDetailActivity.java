@@ -80,8 +80,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private ChildEventListener mFavoriteEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            //データの登録解除のボタsetImageResourceンに切り替える処理をかく
-            mfab2Button.setImageResource(R.drawable.unlike);
+            //データの登録解除ボタンsetImageResourceンに切り替える処理をかく
+            mfab2Button.setImageResource(R.drawable.like);
             //フラグをきりかえる。
             isFavorite = true;
         }
@@ -111,6 +111,12 @@ public class QuestionDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question_detail);
+        //位置の移動
+        // 渡ってきたQuestionのオブジェクトを保持する
+        Bundle extras = getIntent().getExtras();
+        mQuestion = (Question) extras.get("question");
+
+        setTitle(mQuestion.getTitle());
 
         //★★★　↓↓　お気に入りボタンのデータベース取得　QAアプリ課題で追加部分　↓↓　★★★//
         DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
@@ -122,7 +128,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
         mfab2Button.setVisibility(View.GONE);
 
         //★★★　↓↓　ログイン済ユーザーの取得　QAアプリ課題で追加部分　↓↓　★★★//
-        user = FirebaseAuth.getInstance().getCurrentUser();
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             // ボタンを表示
@@ -152,7 +157,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
 
                 Map<String, String> data = new HashMap<String, String>();
                 data.put("genru", String.valueOf(mQuestion.getGenre()));
-                genreRef.push().setValue(data, this);
+                genreRef.setValue(data);
 
                 }
                 //★★★　↓↓　お気に入りにしているフラグ　QAアプリ課題で追加部分　↓↓　★★★//
@@ -163,11 +168,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         });
 
 
-        // 渡ってきたQuestionのオブジェクトを保持する
-        Bundle extras = getIntent().getExtras();
-        mQuestion = (Question) extras.get("question");
 
-        setTitle(mQuestion.getTitle());
 
         // ListViewの準備
         mListView = (ListView) findViewById(R.id.listView);
