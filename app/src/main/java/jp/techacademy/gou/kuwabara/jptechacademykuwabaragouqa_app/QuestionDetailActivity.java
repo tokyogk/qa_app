@@ -20,24 +20,24 @@ import java.util.Map;
 
 public class QuestionDetailActivity extends AppCompatActivity {
 
-    private ListView mListView;
-    private Question mQuestion;
-    private QuestionDetailListAdapter mAdapter;
-    //★★★　↓↓　 ボタンの変数設定　QAアプリ課題で追加部分　↓↓　★★★//
-    private FloatingActionButton mfab2Button;
-    private DatabaseReference mAnswerRef;
+                private ListView mListView;
+                private Question mQuestion;
+                private QuestionDetailListAdapter mAdapter;
+                //★★★　↓↓　 ボタンの変数設定　QAアプリ課題で追加部分　↓↓　★★★//
+                private FloatingActionButton mfab2Button;
+                private DatabaseReference mAnswerRef;
 
-    //★★★　↓↓　 お気に入り判別用のboolean　QAアプリ課題で追加部分　↓↓　★★★//
-    private boolean isFavorite = false;
-    //★★★　↓↓　 ファイヤーベースでのユーザー変数設定　QAアプリ課題で追加部分　↓↓　★★★//
-    private FirebaseUser user;
+                //★★★　↓↓　 お気に入り判別用のboolean　QAアプリ課題で追加部分　↓↓　★★★//
+                private boolean isFavorite = false;
+                //★★★　↓↓　 ファイヤーベースでのユーザー変数設定　QAアプリ課題で追加部分　↓↓　★★★//
+                private FirebaseUser user;
 
-    private ChildEventListener mEventListener = new ChildEventListener() {
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            HashMap map = (HashMap) dataSnapshot.getValue();
+                private ChildEventListener mEventListener = new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        HashMap map = (HashMap) dataSnapshot.getValue();
 
-            String answerUid = dataSnapshot.getKey();
+                        String answerUid = dataSnapshot.getKey();
 
             for(Answer answer : mQuestion.getAnswers()) {
                 // 同じAnswerUidのものが存在しているときは何もしない
