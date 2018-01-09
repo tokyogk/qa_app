@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
                 } else{}
 
             }
-        }); 
+        });
 
         // ナビゲーションドロワーの設定
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
