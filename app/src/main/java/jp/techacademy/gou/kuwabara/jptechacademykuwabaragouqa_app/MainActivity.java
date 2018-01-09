@@ -94,19 +94,19 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCancelled(DatabaseError databaseError) {
 
+        }};
+
+    private ChildEventListener mFavoliteEventListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            HashMap map = (HashMap) dataSnapshot.getValue();
+            String title = (String) map.get( "title" );
+            String uid = (String) map.get( "uid" );
+
+            Favorite favorite = new Favorite( title, uid, mGenre );
+            mFavoriterrayList.add( favorite );
+            mAdapter.notifyDataSetChanged();
         }
-
-        private ChildEventListener mFavoliteEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                HashMap map = (HashMap) dataSnapshot.getValue();
-                String title = (String) map.get("title");
-                String uid = (String) map.get("uid");
-
-                Favorite favorite = new Favorite(title, uid, mGenre);
-                mFavoriterrayList.add(favorite);
-                mAdapter.notifyDataSetChanged();
-            }
 
 
         @Override
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            
+
         }
 
 
