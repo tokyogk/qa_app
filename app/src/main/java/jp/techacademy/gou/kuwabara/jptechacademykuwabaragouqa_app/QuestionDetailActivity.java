@@ -20,24 +20,24 @@ import java.util.Map;
 
 public class QuestionDetailActivity extends AppCompatActivity {
 
-                private ListView mListView;
-                private Question mQuestion;
-                private QuestionDetailListAdapter mAdapter;
-                //★★★　↓↓　 ボタンの変数設定　QAアプリ課題で追加部分　↓↓　★★★//
-                private FloatingActionButton mfab2Button;
-                private DatabaseReference mAnswerRef;
+    private ListView mListView;
+    private Question mQuestion;
+    private QuestionDetailListAdapter mAdapter;
+    //★★★　↓↓　 ボタンの変数設定　QAアプリ課題で追加部分　↓↓　★★★//
+    private FloatingActionButton mfab2Button;
+    private DatabaseReference mAnswerRef;
 
-                //★★★　↓↓　 お気に入り判別用のboolean　QAアプリ課題で追加部分　↓↓　★★★//
-                private boolean isFavorite = false;
-                //★★★　↓↓　 ファイヤーベースでのユーザー変数設定　QAアプリ課題で追加部分　↓↓　★★★//
-                private FirebaseUser user;
+    //★★★　↓↓　 お気に入り判別用のboolean　QAアプリ課題で追加部分　↓↓　★★★//
+    private boolean isFavorite = false;
+    //★★★　↓↓　 ファイヤーベースでのユーザー変数設定　QAアプリ課題で追加部分　↓↓　★★★//
+    private FirebaseUser user;
 
-                private ChildEventListener mEventListener = new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        HashMap map = (HashMap) dataSnapshot.getValue();
+    private ChildEventListener mEventListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            HashMap map = (HashMap) dataSnapshot.getValue();
 
-                        String answerUid = dataSnapshot.getKey();
+            String answerUid = dataSnapshot.getKey();
 
             for(Answer answer : mQuestion.getAnswers()) {
                 // 同じAnswerUidのものが存在しているときは何もしない
@@ -132,7 +132,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         if (user != null) {
             // ボタンを表示
             mfab2Button.setVisibility(View.VISIBLE);
-            DatabaseReference favRef = dataBaseReference.child(Const.UsersPATH).child(user.getUid()).child(mQuestion.getQuestionUid());
+            DatabaseReference favRef = dataBaseReference.child(Const.FavoritePATH).child(user.getUid()).child(mQuestion.getQuestionUid());
             favRef.addChildEventListener(mFavoriteEventListener);
 
         }else{
@@ -155,9 +155,9 @@ public class QuestionDetailActivity extends AppCompatActivity {
                     //★★★　↓↓　お気に入りボタン表示　QAアプリ課題で追加部分　↓↓　★★★//
                     mfab2Button.setImageResource(R.drawable.like);
 
-                Map<String, String> data = new HashMap<String, String>();
-                data.put("genru", String.valueOf(mQuestion.getGenre()));
-                genreRef.setValue(data);
+                    Map<String, String> data = new HashMap<String, String>();
+                    data.put("genru", String.valueOf(mQuestion.getGenre()));
+                    genreRef.setValue(data);
 
                 }
                 //★★★　↓↓　お気に入りにしているフラグ　QAアプリ課題で追加部分　↓↓　★★★//
