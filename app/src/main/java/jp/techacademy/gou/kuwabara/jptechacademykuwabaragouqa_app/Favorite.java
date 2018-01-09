@@ -4,16 +4,25 @@ import java.io.Serializable;
 
 
 public class Favorite implements Serializable {
+    private String mTitle;
     private String mUid;
-    private String mQuestionUid;
+    private int mGenre;
 
-    public Favorite( String uid, String questionUid) {
-        mUid = uid;
-        mQuestionUid = questionUid;
+    public String getTitle() {
+        return mTitle;
     }
 
     public String getUid() {return mUid;}
 
-    public String getQuestionUid() { return mQuestionUid; }
+    public int getGenre() { return mGenre; }
+
+
+    public Favorite( String title,  String uid, int genre) {
+        mTitle = title;
+        mUid = uid;
+        mGenre = genre;
+    }
+
+
 }
 //★★★　↑↑　QAアプリ課題で追加部分　↑↑　★★★//

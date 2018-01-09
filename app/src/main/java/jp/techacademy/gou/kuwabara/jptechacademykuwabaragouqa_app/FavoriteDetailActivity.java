@@ -18,26 +18,30 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.HashMap;
 import java.util.Map;
 
-public class QuestionDetailActivity extends AppCompatActivity {
+/**
+ * Created by kuwabarago on 2018/01/07.
+ */
 
-                private ListView mListView;
-                private Question mQuestion;
-                private QuestionDetailListAdapter mAdapter;
-                //★★★　↓↓　 ボタンの変数設定　QAアプリ課題で追加部分　↓↓　★★★//
-                private FloatingActionButton mfab2Button;
-                private DatabaseReference mAnswerRef;
+public class FavoriteDetailActivity extends AppCompatActivity {
 
-                //★★★　↓↓　 お気に入り判別用のboolean　QAアプリ課題で追加部分　↓↓　★★★//
-                private boolean isFavorite = false;
-                //★★★　↓↓　 ファイヤーベースでのユーザー変数設定　QAアプリ課題で追加部分　↓↓　★★★//
-                private FirebaseUser user;
+    private ListView mListView;
+    private Question mQuestion;
+    private QuestionDetailListAdapter mAdapter;
+    //★★★　↓↓　 ボタンの変数設定　QAアプリ課題で追加部分　↓↓　★★★//
+    private FloatingActionButton mfab2Button;
+    private DatabaseReference mAnswerRef;
 
-                private ChildEventListener mEventListener = new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        HashMap map = (HashMap) dataSnapshot.getValue();
+    //★★★　↓↓　 お気に入り判別用のboolean　QAアプリ課題で追加部分　↓↓　★★★//
+    private boolean isFavorite = false;
+    //★★★　↓↓　 ファイヤーベースでのユーザー変数設定　QAアプリ課題で追加部分　↓↓　★★★//
+    private FirebaseUser user;
 
-                        String answerUid = dataSnapshot.getKey();
+    private ChildEventListener mEventListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            HashMap map = (HashMap) dataSnapshot.getValue();
+
+            String answerUid = dataSnapshot.getKey();
 
             for(Answer answer : mQuestion.getAnswers()) {
                 // 同じAnswerUidのものが存在しているときは何もしない
@@ -125,14 +129,14 @@ public class QuestionDetailActivity extends AppCompatActivity {
         mfab2Button = (FloatingActionButton) findViewById(R.id.fab2);
 
         //★★★　↓↓　お気に入りボタンの表示　　QAアプリ課題で追加部分　↓↓　★★★//
-        mfab2Button.setVisibility(View.GONE);
+        mfab2Button.setVisibility( View.GONE);
 
         //★★★　↓↓　ログイン済ユーザーの取得　QAアプリ課題で追加部分　↓↓　★★★//
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             // ボタンを表示
             mfab2Button.setVisibility(View.VISIBLE);
-            DatabaseReference favRef = dataBaseReference.child(Const.UsersPATH).child(user.getUid()).child(mQuestion.getQuestionUid());
+            DatabaseReference favRef = dataBaseReference.child(Const.FavoritePATH).child(user.getUid()).child(mQuestion.getQuestionUid());
             favRef.addChildEventListener(mFavoriteEventListener);
 
         }else{
@@ -155,9 +159,9 @@ public class QuestionDetailActivity extends AppCompatActivity {
                     //★★★　↓↓　お気に入りボタン表示　QAアプリ課題で追加部分　↓↓　★★★//
                     mfab2Button.setImageResource(R.drawable.like);
 
-                Map<String, String> data = new HashMap<String, String>();
-                data.put("genru", String.valueOf(mQuestion.getGenre()));
-                genreRef.setValue(data);
+                    Map<String, String> data = new HashMap<String, String>();
+                    data.put("genru", String.valueOf(mQuestion.getGenre()));
+                    genreRef.setValue(data);
 
                 }
                 //★★★　↓↓　お気に入りにしているフラグ　QAアプリ課題で追加部分　↓↓　★★★//

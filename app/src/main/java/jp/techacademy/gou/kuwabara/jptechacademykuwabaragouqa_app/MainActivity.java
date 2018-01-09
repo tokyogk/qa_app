@@ -32,12 +32,14 @@ public class MainActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private int mGenre = 0;
+    private int mFavorite = 0;
 
     private DatabaseReference mDatabaseReference;
     private DatabaseReference mGenreRef;
     private ListView mListView;
     private ArrayList<Question> mQuestionArrayList;
-    private ArrayList<Favorite> mFavoriteArrayList;
+    //★★★　↓↓　 お気に入り一覧用変数　QAアプリ課題で追加部分　↓↓　★★★//
+    private ArrayList<Favorite> mFavoriterrayList;
     private QuestionsListAdapter mAdapter;
 
     private ChildEventListener mEventListener = new ChildEventListener() {
@@ -76,6 +78,39 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+
+        private ChildEventListener mFavoliteEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                HashMap map = (HashMap) dataSnapshot.getValue();
+                String title = (String) map.get("title");
+                String uid = (String) map.get("uid");
+
+                Favorite favorite = new Favorite(title, uid, mGenre);
+                mFavoriterrayList.add(favorite);
+                mAdapter.notifyDataSetChanged();
+            }
+
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
             HashMap map = (HashMap) dataSnapshot.getValue();
 
             // 変更があったQuestionを探す
@@ -97,7 +132,10 @@ public class MainActivity extends AppCompatActivity {
                     mAdapter.notifyDataSetChanged();
                 }
             }
+
+            
         }
+
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
@@ -145,8 +183,17 @@ public class MainActivity extends AppCompatActivity {
                     // ジャンルを渡して質問作成画面を起動する
                     Intent intent = new Intent(getApplicationContext(), QuestionSendActivity.class);
                     intent.putExtra("genre", mGenre);
+                    intent.putExtra("favorite", mFavorite);
                     startActivity(intent);
                 }
+
+                //お気に入り一覧用の判別
+                if (mFavorite == 5) {
+                    // お気に入りを渡してお気に入り一覧画面を起動する
+                    Intent intent = new Intent(getApplicationContext(), FavoriteDetailActivity.class);
+                    intent.putExtra("favorite", mFavorite);
+                    startActivity(intent);
+                } else{}
 
             }
         });
@@ -177,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
                     mGenre = 4;
                 } else if (id == R.id.nav_favorite) {
                     mToolbar.setTitle("お気に入り");
+                    mFavorite = 5;
                 }
 
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -194,6 +242,10 @@ public class MainActivity extends AppCompatActivity {
                 mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
                 mGenreRef.addChildEventListener(mEventListener);
                 return true;
+
+                // お気に入りのリストをクリアしてから再度Adapterにセットし、AdapterをListViewにセットし直す
+
+
             }
         });
 
@@ -204,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
         mListView = (ListView) findViewById(R.id.listView);
         mAdapter = new QuestionsListAdapter(this);
         mQuestionArrayList = new ArrayList<Question>();
+        mFavoriterrayList = new ArrayList <Favorite>();
         mAdapter.notifyDataSetChanged();
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
