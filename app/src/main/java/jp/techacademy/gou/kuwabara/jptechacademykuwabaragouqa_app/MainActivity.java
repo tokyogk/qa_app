@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DatabaseReference mDatabaseReference;
     private DatabaseReference mGenreRef;
+    private DatabaseReference mQuestionsRef;
     private ListView mListView;
     private ArrayList<Question> mQuestionArrayList;
     //★★★　↓↓　 お気に入り一覧用変数　QAアプリ課題で追加部分　↓↓　★★★//
@@ -241,6 +242,14 @@ public class MainActivity extends AppCompatActivity {
                 }
                 mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
                 mGenreRef.addChildEventListener(mEventListener);
+                return true;
+
+                // 選択したお気に入りにリスナーを登録する
+                if (mQuestionsRef != null) {
+                    mQuestionsRef.removeEventListener(mEventListener);
+                }
+                mDatabaseReference = mDatabaseReference.child(Const.ContentsPATH);
+                mDatabaseReference.addChildEventListener(mEventListener);
                 return true;
 
                 // お気に入りのリストをクリアしてから再度Adapterにセットし、AdapterをListViewにセットし直す
