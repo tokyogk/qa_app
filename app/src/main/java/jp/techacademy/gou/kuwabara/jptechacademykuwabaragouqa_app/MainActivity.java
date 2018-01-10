@@ -209,6 +209,9 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
+
+
+
                 int id = item.getItemId();
 
                 if (id == R.id.nav_hobby) {
@@ -236,21 +239,23 @@ public class MainActivity extends AppCompatActivity {
                 mAdapter.setQuestionArrayList(mQuestionArrayList);
                 mListView.setAdapter(mAdapter);
 
+
                 // 選択したジャンルにリスナーを登録する
                 if (mGenreRef != null) {
                     mGenreRef.removeEventListener(mEventListener);
                 }
+
                 mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
                 mGenreRef.addChildEventListener(mEventListener);
-                return true;
 
                 // 選択したお気に入りにリスナーを登録する
                 if (mQuestionsRef != null) {
-                    mQuestionsRef.removeEventListener(mEventListener);
+                    mQuestionsRef.removeEventListener(mFavoliteEventListener);
                 }
                 mDatabaseReference = mDatabaseReference.child(Const.ContentsPATH);
-                mDatabaseReference.addChildEventListener(mEventListener);
+                mDatabaseReference.addChildEventListener(mFavoliteEventListener);
                 return true;
+
 
                 // お気に入りのリストをクリアしてから再度Adapterにセットし、AdapterをListViewにセットし直す
 
@@ -260,6 +265,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Firebase
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mQuestionsRef =  FirebaseDatabase.getInstance().getReference();
 
         // ListViewの準備
         mListView = (ListView) findViewById(R.id.listView);
