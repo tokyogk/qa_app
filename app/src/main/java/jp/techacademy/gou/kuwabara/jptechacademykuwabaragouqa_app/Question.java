@@ -41,6 +41,7 @@ public class Question implements Serializable {
         mTitle = title;
         mBody = body;
         mName = name;
+        mUid = uid;
         mQuestionUid = questionUid;
         mGenre = genre;
         mBitmapArray = bytes.clone();
