@@ -27,6 +27,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,41 +45,50 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> mFavoriteQuestionUidList = new ArrayList<>();
     private QuestionsListAdapter mAdapter;
 
+    // HashMapのデータをQuestionオブジェクトに変換する
+    private Question convertMapToQuestion(String questionUid, HashMap map) {
+        String title = (String) map.get("title");
+        String body = (String) map.get("body");
+        String name = (String) map.get("name");
+        String imageString = (String) map.get("image");
+        byte[] bytes;
+        if (imageString != null) {
+            bytes = Base64.decode(imageString, Base64.DEFAULT);
+        } else {
+            bytes = new byte[0];
+        }
+
+        ArrayList<Answer> answerArrayList = new ArrayList<Answer>();
+        HashMap answerMap = (HashMap) map.get("answers");
+        if (answerMap != null) {
+            for (Object key : answerMap.keySet()) {
+                HashMap temp = (HashMap) answerMap.get((String) key);
+                String answerBody = (String) temp.get("body");
+                String answerName = (String) temp.get("name");
+                String answerUid = (String) temp.get("uid");
+                Answer answer = new Answer(answerBody, answerName, answerUid, (String) key);
+                answerArrayList.add(answer);
+            }
+        }
+
+        return new Question(title, body, name, questionUid, mGenre, bytes, answerArrayList);
+    }
+
     private ChildEventListener mEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            HashMap map = (HashMap) dataSnapshot.getValue();
-            String title = (String) map.get("title");
-            String body = (String) map.get("body");
-            String name = (String) map.get("name");
-            String uid = (String) map.get("uid");
-            String imageString = (String) map.get("image");
-            byte[] bytes;
-            if (imageString != null) {
-                bytes = Base64.decode(imageString, Base64.DEFAULT);
-            } else {
-                bytes = new byte[0];
-            }
-
-            ArrayList<Answer> answerArrayList = new ArrayList<Answer>();
-            HashMap answerMap = (HashMap) map.get("answers");
-            if (answerMap != null) {
-                for (Object key : answerMap.keySet()) {
-                    HashMap temp = (HashMap) answerMap.get((String) key);
-                    String answerBody = (String) temp.get("body");
-                    String answerName = (String) temp.get("name");
-                    String answerUid = (String) temp.get("uid");
-                    Answer answer = new Answer(answerBody, answerName, answerUid, (String) key);
-                    answerArrayList.add(answer);
-                }
-            }
-
-            Question question = new Question(title, body, name, uid, dataSnapshot.getKey(), mGenre, bytes, answerArrayList);
+            // お気に入りの場合
             if (mGenre == 5) {
-                if (mFavoriteQuestionUidList.contains(question.getUid())) {
-                    mQuestionArrayList.add(question);
+                // ジャンルごとにまず取れるので、それを１つずつ見て中身を抽出する
+                HashMap<String, HashMap<String, String>> map = (HashMap) dataSnapshot.getValue();
+                for (Map.Entry<String, HashMap<String, String>> questionData : map.entrySet()) {
+                    Question question = MainActivity.this.convertMapToQuestion(questionData.getKey(), questionData.getValue());
+                    if (mFavoriteQuestionUidList.contains(question.getQuestionUid())) {
+                        mQuestionArrayList.add(question);
+                    }
                 }
             } else {
+                Question question = MainActivity.this.convertMapToQuestion(dataSnapshot.getKey(), (HashMap) dataSnapshot.getValue());
                 mQuestionArrayList.add(question);
             }
             mAdapter.notifyDataSetChanged();
@@ -107,8 +118,7 @@ public class MainActivity extends AppCompatActivity {
     private ChildEventListener mFavoriteEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            HashMap map = (HashMap) dataSnapshot.getValue();
-            String uid = (String) map.get("uid");
+            String uid = dataSnapshot.getKey();
 
             mFavoriteQuestionUidList.add(uid);
             mAdapter.notifyDataSetChanged();
@@ -236,7 +246,6 @@ public class MainActivity extends AppCompatActivity {
                 mGenreRef.addChildEventListener(mEventListener);
 
                 // お気に入り用の質問のリストをクリアしてから再度Adapterにセットし、AdapterをListViewにセットし直す
-                mQuestionArrayList.clear();
                 mAdapter.setQuestionArrayList(mQuestionArrayList);
                 mListView.setAdapter(mAdapter);
 
@@ -244,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
                 if (mGenre == 5) {
                     mFavoriteQuestionUidList.clear();
                     if (mContentsRef != null) {
-                        mContentsRef.removeEventListener(mFavoriteEventListener);
+                        mContentsRef.removeEventListener(mEventListener);
                     }
                     if (mFavoriteRef != null) {
                         mFavoriteRef.removeEventListener(mFavoriteEventListener);
