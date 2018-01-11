@@ -36,7 +36,8 @@ public class MainActivity extends AppCompatActivity {
 
     private DatabaseReference mDatabaseReference;
     private DatabaseReference mGenreRef;
-    private DatabaseReference mQuestionsRef;
+    private DatabaseReference mContentsRef;
+    private DatabaseReference mFavariteRef;
     private ListView mListView;
     private ArrayList<Question> mQuestionArrayList;
     //★★★　↓↓　 お気に入り一覧用変数　QAアプリ課題で追加部分　↓↓　★★★//
@@ -110,6 +111,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+
+
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
             HashMap map = (HashMap) dataSnapshot.getValue();
@@ -161,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -239,7 +241,6 @@ public class MainActivity extends AppCompatActivity {
                 mAdapter.setQuestionArrayList(mQuestionArrayList);
                 mListView.setAdapter(mAdapter);
 
-
                 // 選択したジャンルにリスナーを登録する
                 if (mGenreRef != null) {
                     mGenreRef.removeEventListener(mEventListener);
@@ -254,23 +255,23 @@ public class MainActivity extends AppCompatActivity {
                 mListView.setAdapter(mAdapter);
 
                 // 選択したお気に入りにリスナーを登録する
-                if (mQuestionsRef != null) {
-                    mQuestionsRef.removeEventListener(mFavoliteEventListener);
+                if (mContentsRef != null) {
+                    mContentsRef.removeEventListener(mFavoliteEventListener);
                 }
-                mQuestionsRef = mDatabaseReference.child(Const.ContentsPATH);
-                mQuestionsRef.addChildEventListener(mFavoliteEventListener);
+                mContentsRef = mDatabaseReference.child(Const.ContentsPATH);
+                mContentsRef.addChildEventListener(mFavoliteEventListener);
+
+
+
                 return true;
-
-
-                // お気に入りのリストをクリアしてから再度Adapterにセットし、AdapterをListViewにセットし直す
-
 
             }
         });
 
         // Firebase
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
-        mQuestionsRef =  FirebaseDatabase.getInstance().getReference();
+        mContentsRef =  FirebaseDatabase.getInstance().getReference().child("contents");
+        mFavariteRef = FirebaseDatabase.getInstance().getReference().child("favarite");
 
         // ListViewの準備
         mListView = (ListView) findViewById(R.id.listView);
