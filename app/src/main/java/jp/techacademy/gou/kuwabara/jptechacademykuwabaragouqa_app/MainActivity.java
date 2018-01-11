@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             String uid = (String) map.get( "uid" );
 
             Favorite favorite = new Favorite( title, uid, mGenre );
-            mFavoriterrayList.add( favorite );
+            mFavoriterrayList.add(favorite);
             mAdapter.notifyDataSetChanged();
         }
 
@@ -248,12 +248,17 @@ public class MainActivity extends AppCompatActivity {
                 mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
                 mGenreRef.addChildEventListener(mEventListener);
 
+                // お気に入り用の質問のリストをクリアしてから再度Adapterにセットし、AdapterをListViewにセットし直す
+                mQuestionArrayList.clear();
+                mAdapter.setQuestionArrayList(mQuestionArrayList);
+                mListView.setAdapter(mAdapter);
+
                 // 選択したお気に入りにリスナーを登録する
                 if (mQuestionsRef != null) {
                     mQuestionsRef.removeEventListener(mFavoliteEventListener);
                 }
-                mDatabaseReference = mDatabaseReference.child(Const.ContentsPATH);
-                mDatabaseReference.addChildEventListener(mFavoliteEventListener);
+                mQuestionsRef = mDatabaseReference.child(Const.ContentsPATH);
+                mQuestionsRef.addChildEventListener(mFavoliteEventListener);
                 return true;
 
 
