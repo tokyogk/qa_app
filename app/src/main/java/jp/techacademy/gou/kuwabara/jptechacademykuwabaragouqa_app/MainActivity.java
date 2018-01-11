@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         String title = (String) map.get("title");
         String body = (String) map.get("body");
         String name = (String) map.get("name");
+        String uid = (String) map.get("uid");
         String imageString = (String) map.get("image");
         byte[] bytes;
         if (imageString != null) {
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        return new Question(title, body, name, questionUid, mGenre, bytes, answerArrayList);
+        return new Question(title, body, name, uid, questionUid, mGenre, bytes, answerArrayList);
     }
 
     private ChildEventListener mEventListener = new ChildEventListener() {

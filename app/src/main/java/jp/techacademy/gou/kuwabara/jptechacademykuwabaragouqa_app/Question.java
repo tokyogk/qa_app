@@ -25,6 +25,10 @@ public class Question implements Serializable {
         return mName;
     }
 
+    public String getUid() {
+        return mUid;
+    }
+
     public String getQuestionUid() { return mQuestionUid; }
 
     public int getGenre() { return mGenre; }
@@ -33,7 +37,7 @@ public class Question implements Serializable {
 
     public ArrayList<Answer> getAnswers() { return mAnswerArrayList; }
 
-    public Question(String title, String body, String name, String questionUid, int genre, byte[] bytes, ArrayList<Answer> answers) {
+    public Question(String title, String body, String name, String uid, String questionUid, int genre, byte[] bytes, ArrayList<Answer> answers) {
         mTitle = title;
         mBody = body;
         mName = name;
