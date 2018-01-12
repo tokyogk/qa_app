@@ -27,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,45 +38,62 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference mDatabaseReference;
     private DatabaseReference mGenreRef;
     private DatabaseReference mContentsRef;
-    private DatabaseReference mFavariteRef;
+    private DatabaseReference mFavoriteRef;
     private ListView mListView;
-    private ArrayList<Question> mQuestionArrayList;
+    private ArrayList <Question> mQuestionArrayList;
     //★★★　↓↓　 お気に入り一覧用変数　QAアプリ課題で追加部分　↓↓　★★★//
-    private ArrayList<Favorite> mFavoriterrayList;
+    private ArrayList <String> mFavoriteQuestionUidList = new ArrayList <> ();
     private QuestionsListAdapter mAdapter;
 
-    private ChildEventListener mEventListener = new ChildEventListener() {
+    // HashMapのデータをQuestionオブジェクトに変換する
+    private Question convertMapToQuestion(String questionUid, HashMap map) {
+        String title = (String) map.get ( "title" );
+        String body = (String) map.get ( "body" );
+        String name = (String) map.get ( "name" );
+        String uid = (String) map.get ( "uid" );
+        String imageString = (String) map.get ( "image" );
+        byte[] bytes;
+        if (imageString != null) {
+            bytes = Base64.decode ( imageString, Base64.DEFAULT );
+        } else {
+            bytes = new byte[0];
+        }
+
+        ArrayList <Answer> answerArrayList = new ArrayList <Answer> ();
+        HashMap answerMap = (HashMap) map.get ( "answers" );
+        if (answerMap != null) {
+            for (Object key : answerMap.keySet ()) {
+                HashMap temp = (HashMap) answerMap.get ( (String) key );
+                String answerBody = (String) temp.get ( "body" );
+                String answerName = (String) temp.get ( "name" );
+                String answerUid = (String) temp.get ( "uid" );
+                Answer answer = new Answer ( answerBody, answerName, answerUid, (String) key );
+                answerArrayList.add ( answer );
+            }
+        }
+
+        return new Question ( title, body, name, uid, questionUid, mGenre, bytes, answerArrayList );
+    }
+
+    private ChildEventListener mEventListener = new ChildEventListener () {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            HashMap map = (HashMap) dataSnapshot.getValue();
-            String title = (String) map.get("title");
-            String body = (String) map.get("body");
-            String name = (String) map.get("name");
-            String uid = (String) map.get("uid");
-            String imageString = (String) map.get("image");
-            byte[] bytes;
-            if (imageString != null) {
-                bytes = Base64.decode(imageString, Base64.DEFAULT);
-            } else {
-                bytes = new byte[0];
-            }
-
-            ArrayList<Answer> answerArrayList = new ArrayList<Answer>();
-            HashMap answerMap = (HashMap) map.get("answers");
-            if (answerMap != null) {
-                for (Object key : answerMap.keySet()) {
-                    HashMap temp = (HashMap) answerMap.get((String) key);
-                    String answerBody = (String) temp.get("body");
-                    String answerName = (String) temp.get("name");
-                    String answerUid = (String) temp.get("uid");
-                    Answer answer = new Answer(answerBody, answerName, answerUid, (String) key);
-                    answerArrayList.add(answer);
+            // お気に入りの場合
+            if (mGenre == 5) {
+                // ジャンルごとにまず取れるので、それを１つずつ見て中身を抽出する
+                HashMap <String, HashMap <String, String>> map = (HashMap) dataSnapshot.getValue ();
+                for (Map.Entry <String, HashMap <String, String>> questionData : map.entrySet ()) {
+                    Question question = MainActivity.this.convertMapToQuestion(questionData.getKey(), questionData.getValue());
+                    if (mFavoriteQuestionUidList.contains ( question.getQuestionUid () )) {
+                        mQuestionArrayList.add ( question );
+                    }
                 }
+            } else {
+                Question question = MainActivity.this.convertMapToQuestion ( dataSnapshot.getKey (), (HashMap) dataSnapshot.getValue () );
+                mQuestionArrayList.add ( question );
             }
 
-            Question question = new Question(title, body, name, uid, dataSnapshot.getKey(), mGenre, bytes, answerArrayList);
-            mQuestionArrayList.add(question);
-            mAdapter.notifyDataSetChanged();
+            mAdapter.notifyDataSetChanged ();
         }
 
         @Override
@@ -96,44 +114,38 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCancelled(DatabaseError databaseError) {
 
-        }};
+        }
+    };
 
-    private ChildEventListener mFavoliteEventListener = new ChildEventListener() {
+    private ChildEventListener mFavoriteEventListener = new ChildEventListener () {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            HashMap map = (HashMap) dataSnapshot.getValue();
-            String title = (String) map.get( "title" );
-            String uid = (String) map.get( "uid" );
-
-            Favorite favorite = new Favorite( title, uid, mGenre );
-            mFavoriterrayList.add(favorite);
-            mAdapter.notifyDataSetChanged();
+            String uid = dataSnapshot.getKey ();
+            mFavoriteQuestionUidList.add ( uid );
         }
-
-
 
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            HashMap map = (HashMap) dataSnapshot.getValue();
+            HashMap map = (HashMap) dataSnapshot.getValue ();
 
             // 変更があったQuestionを探す
-            for (Question question: mQuestionArrayList) {
-                if (dataSnapshot.getKey().equals(question.getQuestionUid())) {
-                    question.getAnswers().clear();
-                    HashMap answerMap = (HashMap) map.get("answers");
+            for (Question question : mQuestionArrayList) {
+                if (dataSnapshot.getKey ().equals ( question.getQuestionUid () )) {
+                    question.getAnswers ().clear ();
+                    HashMap answerMap = (HashMap) map.get ( "answers" );
                     if (answerMap != null) {
-                        for (Object key : answerMap.keySet()) {
-                            HashMap temp = (HashMap) answerMap.get((String) key);
-                            String answerBody = (String) temp.get("body");
-                            String answerName = (String) temp.get("name");
-                            String answerUid = (String) temp.get("uid");
-                            Answer answer = new Answer(answerBody, answerName, answerUid, (String) key);
-                            question.getAnswers().add(answer);
+                        for (Object key : answerMap.keySet ()) {
+                            HashMap temp = (HashMap) answerMap.get ( key );
+                            String answerBody = (String) temp.get ( "body" );
+                            String answerName = (String) temp.get ( "name" );
+                            String answerUid = (String) temp.get ( "uid" );
+                            Answer answer = new Answer ( answerBody, answerName, answerUid, (String) key );
+                            question.getAnswers ().add ( answer );
                         }
                     }
 
-                    mAdapter.notifyDataSetChanged();
+                    mAdapter.notifyDataSetChanged ();
                 }
             }
 
@@ -160,168 +172,165 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
+        super.onCreate ( savedInstanceState );
+        setContentView ( R.layout.activity_main );
+        mToolbar = (Toolbar) findViewById ( R.id.toolbar );
+        setSupportActionBar ( mToolbar );
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById ( R.id.fab );
+        fab.setOnClickListener ( new View.OnClickListener () {
             @Override
             public void onClick(View view) {
                 // ジャンルを選択していない場合（mGenre == 0）はエラーを表示するだけ
                 if (mGenre == 0) {
-                    Snackbar.make(view, "ジャンルを選択して下さい", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make ( view, "ジャンルを選択して下さい", Snackbar.LENGTH_LONG ).show ();
                     return;
                 }
 
                 // ログイン済みのユーザーを取得する
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                FirebaseUser user = FirebaseAuth.getInstance ().getCurrentUser ();
 
                 if (user == null) {
                     // ログインしていなければログイン画面に遷移させる
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivity(intent);
+                    Intent intent = new Intent ( getApplicationContext (), LoginActivity.class );
+                    startActivity ( intent );
                 } else {
                     // ジャンルを渡して質問作成画面を起動する
-                    Intent intent = new Intent(getApplicationContext(), QuestionSendActivity.class);
-                    intent.putExtra("genre", mGenre);
-                    intent.putExtra("favorite", mFavorite);
-                    startActivity(intent);
+                    Intent intent = new Intent ( getApplicationContext (), QuestionSendActivity.class );
+                    intent.putExtra ( "genre", mGenre );
+                    startActivity ( intent );
                 }
 
-                //お気に入り一覧用の判別
-                if (mFavorite == 5) {
-                    // お気に入りを渡してお気に入り一覧画面を起動する
-                    Intent intent = new Intent(getApplicationContext(), FavoriteDetailActivity.class);
-                    intent.putExtra("favorite", mFavorite);
-                    startActivity(intent);
-                } else{}
-
             }
-        });
+        } );
 
         // ナビゲーションドロワーの設定
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, mToolbar, R.string.app_name, R.string.app_name);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        DrawerLayout drawer = findViewById ( R.id.drawer_layout );
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle ( this, drawer, mToolbar, R.string.app_name, R.string.app_name );
+        drawer.addDrawerListener ( toggle );
+        toggle.syncState ();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+        NavigationView navigationView = findViewById ( R.id.nav_view );
+        navigationView.setNavigationItemSelectedListener ( new NavigationView.OnNavigationItemSelectedListener () {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
 
 
-
-                int id = item.getItemId();
+                int id = item.getItemId ();
 
                 if (id == R.id.nav_hobby) {
-                    mToolbar.setTitle("趣味");
+                    mToolbar.setTitle ( "趣味" );
                     mGenre = 1;
                 } else if (id == R.id.nav_life) {
-                    mToolbar.setTitle("生活");
+                    mToolbar.setTitle ( "生活" );
                     mGenre = 2;
                 } else if (id == R.id.nav_health) {
-                    mToolbar.setTitle("健康");
+                    mToolbar.setTitle ( "健康" );
                     mGenre = 3;
                 } else if (id == R.id.nav_compter) {
-                    mToolbar.setTitle("コンピューター");
+                    mToolbar.setTitle ( "コンピューター" );
                     mGenre = 4;
                 } else if (id == R.id.nav_favorite) {
-                    mToolbar.setTitle("お気に入り");
-                    mFavorite = 5;
+                    mToolbar.setTitle ( "お気に入り" );
+                    mGenre = 5;
                 }
 
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                drawer.closeDrawer(GravityCompat.START);
+                DrawerLayout drawer = findViewById ( R.id.drawer_layout );
+                drawer.closeDrawer ( GravityCompat.START );
 
                 // 質問のリストをクリアしてから再度Adapterにセットし、AdapterをListViewにセットし直す
-                mQuestionArrayList.clear();
-                mAdapter.setQuestionArrayList(mQuestionArrayList);
-                mListView.setAdapter(mAdapter);
+                mQuestionArrayList.clear ();
+                mAdapter.setQuestionArrayList ( mQuestionArrayList );
+                mListView.setAdapter ( mAdapter );
 
                 // 選択したジャンルにリスナーを登録する
                 if (mGenreRef != null) {
-                    mGenreRef.removeEventListener(mEventListener);
+                    mGenreRef.removeEventListener ( mEventListener );
                 }
 
-                mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
-                mGenreRef.addChildEventListener(mEventListener);
+                mGenreRef = mDatabaseReference.child ( Const.ContentsPATH ).child ( String.valueOf ( mGenre ) );
+                mGenreRef.addChildEventListener ( mEventListener );
 
                 // お気に入り用の質問のリストをクリアしてから再度Adapterにセットし、AdapterをListViewにセットし直す
-                mQuestionArrayList.clear();
-                mAdapter.setQuestionArrayList(mQuestionArrayList);
-                mListView.setAdapter(mAdapter);
+                mQuestionArrayList.clear ();
+                mAdapter.setQuestionArrayList ( mQuestionArrayList );
+                mListView.setAdapter ( mAdapter );
 
-                // 選択したお気に入りにリスナーを登録する
-                if (mContentsRef != null) {
-                    mContentsRef.removeEventListener(mFavoliteEventListener);
+                // お気に入りを選択した場合
+                if (mFavorite == 5) {
+                    mFavoriteQuestionUidList.clear ();
+                    if (mContentsRef != null) {
+                        mContentsRef.removeEventListener ( mEventListener );
+                    }
+                    if (mFavoriteRef != null) {
+                        mFavoriteRef.removeEventListener ( mFavoriteEventListener );
+                    }
+
+                    FirebaseUser user = FirebaseAuth.getInstance ().getCurrentUser ();
+                    if (user != null) {
+                        mFavoriteRef = mDatabaseReference.child ( Const.FavoritePATH ).child ( user.getUid () );
+                        mFavoriteRef.addChildEventListener ( mFavoriteEventListener );
+                        mContentsRef = mDatabaseReference.child ( Const.ContentsPATH );
+                        mContentsRef.addChildEventListener ( mEventListener );
+                    }
                 }
-                mContentsRef = mDatabaseReference.child(Const.ContentsPATH);
-                mContentsRef.addChildEventListener(mFavoliteEventListener);
-
-
 
                 return true;
-
             }
-        });
+        } );
 
         // Firebase
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
-        mContentsRef =  FirebaseDatabase.getInstance().getReference().child("contents");
-        mFavariteRef = FirebaseDatabase.getInstance().getReference().child("favarite");
+        mDatabaseReference = FirebaseDatabase.getInstance ().getReference ();
+        mContentsRef = FirebaseDatabase.getInstance ().getReference ().child ( "contents" );
 
         // ListViewの準備
-        mListView = (ListView) findViewById(R.id.listView);
-        mAdapter = new QuestionsListAdapter(this);
-        mQuestionArrayList = new ArrayList<Question>();
-        mFavoriterrayList = new ArrayList <Favorite>();
-        mAdapter.notifyDataSetChanged();
+        mListView = findViewById ( R.id.listView );
+        mAdapter = new QuestionsListAdapter ( this );
+        mQuestionArrayList = new ArrayList <> ();
+        mAdapter.notifyDataSetChanged ();
 
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnItemClickListener ( new AdapterView.OnItemClickListener () {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView <?> parent, View view, int position, long id) {
                 // Questionのインスタンスを渡して質問詳細画面を起動する
-                Intent intent = new Intent(getApplicationContext(), QuestionDetailActivity.class);
-                intent.putExtra("question", mQuestionArrayList.get(position));
-                startActivity(intent);
+                Intent intent = new Intent ( getApplicationContext (), QuestionDetailActivity.class );
+                intent.putExtra ( "question", mQuestionArrayList.get ( position ) );
+                startActivity ( intent );
             }
-        });
+        } );
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater ().inflate ( R.menu.menu_main, menu );
         return true;
     }
 
     @Override
     protected void onResume() {
-        super.onResume();
+        super.onResume ();
         // ナビゲーションドロワーでお気に入りリストの表示・非表示
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        Menu menu = navigationView.getMenu();
-        MenuItem favoMenuItem = menu.findItem(R.id.nav_favorite);
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        NavigationView navigationView = findViewById ( R.id.nav_view );
+        Menu menu = navigationView.getMenu ();
+        MenuItem favoMenuItem = menu.findItem ( R.id.nav_favorite );
+        FirebaseUser user = FirebaseAuth.getInstance ().getCurrentUser ();
         if (user == null) {
-            favoMenuItem.setVisible(false);
+            favoMenuItem.setVisible ( false );
         } else {
-            favoMenuItem.setVisible(true);
+            favoMenuItem.setVisible ( true );
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        int id = item.getItemId ();
 
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(getApplicationContext(), SettingActivity.class);
-            startActivity(intent);
+            Intent intent = new Intent ( getApplicationContext (), SettingActivity.class );
+            startActivity ( intent );
             return true;
         }
 
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected ( item );
     }
 }

@@ -13,6 +13,9 @@ public class Question implements Serializable {
     private byte[] mBitmapArray;
     private ArrayList<Answer> mAnswerArrayList;
 
+    public Question() {
+    }
+
     public String getTitle() {
         return mTitle;
     }

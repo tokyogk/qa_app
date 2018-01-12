@@ -101,6 +101,9 @@ public class LoginActivity extends AppCompatActivity {
                             public void onDataChange(DataSnapshot snapshot) {
                                 Map data = (Map) snapshot.getValue();
                                 saveName((String)data.get("name"));
+                                if (data != null) {
+                                    saveName((String) data.get("name"));
+                                    }
                             }
                             @Override
                             public void onCancelled(DatabaseError firebaseError) {
