@@ -95,6 +95,8 @@ public class FavoriteDetailActivity extends AppCompatActivity {
 
         }
 
+
+
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
 
@@ -122,7 +124,7 @@ public class FavoriteDetailActivity extends AppCompatActivity {
 
         setTitle(mQuestion.getTitle());
 
-        //★★★　↓↓　お気に入りボタンのデータベース取得　QAアプリ課題で追加部分　↓↓　★★★//
+        //★★★　↓↓　お気に入りボタンのデータベース取得　QAアプリ課題で追加部分　↓↓　★★★// 
         DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
 
         //★★★　↓↓　お気に入りボタンの非表示　　QAアプリ課題で追加部分　↓↓　★★★//
