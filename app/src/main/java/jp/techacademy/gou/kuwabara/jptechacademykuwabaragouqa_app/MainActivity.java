@@ -248,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
                 //★★★　↓↓　 お気に入り用の質問のリストをクリアしてから再度Adapterにセット、AdapterをListViewにセットし直す　QAアプリ課題で追加部分　↓↓　★★★//
                 mAdapter.setQuestionArrayList(mQuestionArrayList);
                 mListView.setAdapter(mAdapter);
+                FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
                 //★★★　↓↓　 お気に入りを選択した時、お気に入り一覧と質問一覧を取得　QAアプリ課題で追加部分　↓↓　★★★//
                 if (mGenre == 5) {
                     //★★★　↓↓　 mFavoriteQuestionUidListをクリアして条件分岐　QAアプリ課題で追加部分　↓↓　★★★//
@@ -266,6 +267,9 @@ public class MainActivity extends AppCompatActivity {
                         mContentsRef = mDatabaseReference.child(Const.ContentsPATH);
                         mContentsRef.addChildEventListener(mEventListener);
                     }
+                    fab.setVisibility(View.GONE);
+                }else {
+                    fab.setVisibility(View.VISIBLE);
                 }
 
                 return true;
